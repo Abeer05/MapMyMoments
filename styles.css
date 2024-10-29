@@ -1,0 +1,118 @@
+html {
+  box-sizing: border-box;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.container-map {
+  box-sizing: initial;
+}
+
+#map {
+  height: 80vh;
+  margin-bottom: 20px;
+}
+
+h1,
+h4,
+h5,
+h2 {
+  font-weight: 600;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+p {
+  color: grey;
+  right: 10px;
+  align-self: flex-end;
+  position: absolute;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+#pins {
+  position: absolute;
+  left: 10px;
+  font-size: 35px;
+}
+
+.hidden {
+  display: none;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#treeLights {
+  flex-direction: column;
+}
+
+img,
+video {
+  height: 400px;
+  flex: 1 0 100%;
+  scroll-snap-align: start;
+  object-fit: cover;
+}
+
+.slider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  padding: 1rem;
+  height: auto;
+}
+
+.slide {
+  display: none;
+}
+
+.slide.active {
+  display: block;
+}
+
+.slider-dots {
+  position: relative;
+  column-gap: 1rem;
+  bottom: 30px;
+  display: flex;
+}
+
+.slider-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #fff;
+  opacity: 0.75;
+  transform: opacity 250ms ease;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider-dot:hover {
+  opacity: 1;
+}
+
+.slider-dot.active {
+  background-color: purple;
+}
