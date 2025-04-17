@@ -1,6 +1,15 @@
-// button.addEventListener("click", () => {
-//   button.classList.add("hidden");
-// });
+const MAX_FILE_SIZE = 1.5; // MB
+
+function getLocalStorageSize() {
+  let total = 0;
+  for (let key in localStorage) {
+    if (localStorage.hasOwnProperty(key)) {
+      const value = localStorage.getItem(key);
+      total += key.length + value.length;
+    }
+  }
+  return (total * 2) / (1024 * 1024);
+}
 
 function dotCheck(slideContainer) {
   const slides = slideContainer.querySelectorAll(".slide");
@@ -143,8 +152,6 @@ function loadSavedMarkers() {
       descriptionElem.textContent = markerData.description;
       newPlaceContent.appendChild(descriptionElem);
 
-      console.log(markerData.label);
-
       if (markerData.mediaUrls && markerData.mediaUrls.length > 0) {
         const slider = document.createElement("div");
         slider.classList.add("slider");
@@ -249,6 +256,22 @@ document
     const label = document.getElementById("placeTitle").value;
     const description = document.getElementById("placeDescription").value;
     const files = document.getElementById("placeFiles").files;
+
+    for (const file of files) {
+      const mb = file.size / (1024 * 1024);
+      if (mb > MAX_FILE_SIZE) {
+        alert(`Each file must be under ${MAX_FILE_SIZE}MB.`);
+        return;
+      }
+    }
+    // const usedMB = getLocalStorageSize();
+    // console.log(`Used Storage: ${usedMB.toFixed(2)} MB`);
+
+    if (getLocalStorageSize() > 4.5) {
+      alert(
+        "You're running out of storage space! Consider removing some markers."
+      );
+    }
 
     if (files.length > 5) {
       alert("You can only upload up to 5 files.");
@@ -366,8 +389,6 @@ document
 
     closeModal();
     document.getElementById("addPlaceForm").reset();
-
-    console.log(slider.children.length);
 
     if (slider.children.length >= 1) {
       // Call dotCheck directly, passing the specific container
