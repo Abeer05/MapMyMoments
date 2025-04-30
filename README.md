@@ -1,1 +1,1 @@
-"# MapMyMoments" 
+MapMyMoments allows you to click anywhere on the map and create memorable moments by adding a description and uploading photos. Each location you click will drop a pin, making it easy to map out and relive your favorite memories. Whether it's a special place, a fun trip, or a hidden gem, this website helps you keep track of the spots that mean the most to you, all while sharing them in a unique way!
