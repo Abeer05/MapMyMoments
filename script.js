@@ -58,11 +58,79 @@ function updateActiveDot(dotsContainer, index) {
 }
 
 function openModal() {
-  document.getElementById("addLocationModal").style.display = "block";
+  const modal = document.getElementById("addLocationModal");
+  modal.style.display = "flex";
+  setTimeout(() => {
+    modal.classList.add("active");
+  }, 10);
 }
 
 function closeModal() {
-  document.getElementById("addLocationModal").style.display = "none";
+  const modal = document.getElementById("addLocationModal");
+  modal.classList.remove("active");
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 300);
+}
+
+window.onclick = function (e) {
+  const modal = document.getElementById("addLocationModal");
+  if (e.target === modal) {
+    closeModal();
+  }
+};
+
+// will probably remove, i like the way im doing it
+function createInfoWindowContent(description, mediaUrls) {
+  const content = document.createElement("div");
+  content.classList.add("info-window-content");
+
+  const descriptionElem = document.createElement("h2");
+  descriptionElem.textContent = description;
+  content.appendChild(descriptionElem);
+
+  if (mediaUrls && mediaUrls.length > 0) {
+    const slider = document.createElement("div");
+    slider.classList.add("slider");
+
+    mediaUrls.forEach((url) => {
+      const isImage = url.startsWith("data:image/");
+      const mediaElement = document.createElement(isImage ? "img" : "video");
+      mediaElement.classList.add("slide");
+      mediaElement.src = url;
+
+      if (!isImage) {
+        mediaElement.controls = true;
+      }
+
+      slider.appendChild(mediaElement);
+    });
+
+    content.appendChild(slider);
+
+    const dotsContainer = document.createElement("div");
+    dotsContainer.classList.add("slider-dots");
+    content.appendChild(dotsContainer);
+
+    if (slider.children.length > 1) {
+      dotCheck(content);
+    } else if (slider.children.length === 1) {
+      slider.children[0].classList.add("active");
+    }
+  }
+
+  return content;
+}
+
+function createMarkerLabel(text) {
+  return {
+    text: text,
+    className: "marker-label",
+    color: "#2c3e50",
+    fontSize: "12px",
+    fontWeight: "600",
+    fontFamily: "Poppins",
+  };
 }
 
 let map;
@@ -145,42 +213,10 @@ function loadSavedMarkers() {
       count++;
 
       // InfoWindow content
-      const newPlaceContent = document.createElement("div");
-      newPlaceContent.id = `place-${count}`;
-
-      const descriptionElem = document.createElement("h2");
-      descriptionElem.textContent = markerData.description;
-      newPlaceContent.appendChild(descriptionElem);
-
-      if (markerData.mediaUrls && markerData.mediaUrls.length > 0) {
-        const slider = document.createElement("div");
-        slider.classList.add("slider");
-
-        markerData.mediaUrls.forEach((mediaUrl) => {
-          const isImage = mediaUrl.startsWith("data:image/");
-          const mediaElement = document.createElement(
-            isImage ? "img" : "video"
-          );
-          mediaElement.classList.add("slide");
-          mediaElement.src = mediaUrl;
-
-          if (!isImage) {
-            mediaElement.controls = true;
-          }
-
-          slider.appendChild(mediaElement);
-        });
-
-        newPlaceContent.appendChild(slider);
-
-        const sliderDots = document.createElement("div");
-        sliderDots.classList.add("slider-dots");
-        newPlaceContent.appendChild(sliderDots);
-
-        if (slider.children.length >= 1) {
-          dotCheck(newPlaceContent);
-        }
-      }
+      const newPlaceContent = createInfoWindowContent(
+        markerData.description,
+        markerData.mediaUrls || []
+      );
 
       const infowindow = new google.maps.InfoWindow({
         content: newPlaceContent,
@@ -203,26 +239,20 @@ function loadSavedMarkers() {
         mediaUrls: markerData.mediaUrls,
       };
 
+      marker.labelText = markerData.label;
+
       marker.addListener("mouseover", function () {
-        marker.setLabel({
-          text: markerData.label,
-          fontSize: "14px",
-          fontWeight: "bold",
-          fontFamily: "Poppins",
-          className: "label",
-        });
+        marker.setLabel(createMarkerLabel(markerData.label));
       });
 
       marker.addListener("mouseout", function () {
-        marker.setLabel({
-          text: " ",
-        });
+        marker.setLabel(null);
       });
 
       marker.addListener("click", function () {
         infowindow.open(map, marker);
         marker.setIcon({
-          url: "img/darkerMarker.png",
+          // url: "img/darkerMarker.png",
           labelOrigin: new google.maps.Point(15, 50),
         });
       });
@@ -247,6 +277,17 @@ function loadSavedMarkers() {
     window.mapMarkers = markers;
   }
 }
+
+document.getElementById("placeFiles").addEventListener("change", function (e) {
+  const filename =
+    e.target.files.length > 0
+      ? e.target.files.length === 1
+        ? e.target.files[0].name
+        : `${e.target.files.length} files selected`
+      : "Upload photos or videos";
+
+  this.parentElement.querySelector("span").textContent = filename;
+});
 
 document
   .getElementById("addLocationModal")
@@ -280,51 +321,8 @@ document
 
     count++;
 
-    const newPlaceContent = document.createElement("div");
-    newPlaceContent.id = `place-${count}`;
+    const newPlaceContent = createInfoWindowContent(description, []);
 
-    const descriptionElem = document.createElement("h2");
-    descriptionElem.textContent = description;
-    newPlaceContent.appendChild(descriptionElem);
-
-    const slider = document.createElement("div");
-    slider.classList.add("slider");
-
-    const mediaUrls = [];
-
-    // STEP 1: Show the media immediately in the slider (preview)
-    Array.from(files).forEach((file) => {
-      const mediaElement = document.createElement(
-        file.type.startsWith("image") ? "img" : "video"
-      );
-      mediaElement.classList.add("slide");
-
-      const objectURL = URL.createObjectURL(file);
-      mediaElement.src = objectURL;
-
-      if (file.type.startsWith("video")) {
-        mediaElement.controls = true;
-      }
-
-      slider.appendChild(mediaElement);
-    });
-
-    // STEP 2: Read and save the files as base64 (asynchronously)
-    const readFileAsDataURL = (file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
-    };
-
-    newPlaceContent.appendChild(slider);
-
-    const sliderDots = document.createElement("div");
-    sliderDots.classList.add("slider-dots");
-    newPlaceContent.appendChild(sliderDots);
-
-    // Create the InfoWindow content
     const infowindow = new google.maps.InfoWindow({
       content: newPlaceContent,
     });
@@ -343,29 +341,21 @@ document
 
     marker.infoContent = {
       description: description,
-      mediaUrls: mediaUrls, // This will be populated async by the FileReader
+      mediaUrls: [], // This will be populated async by the FileReader
     };
 
     marker.addListener("mouseover", function () {
-      marker.setLabel({
-        text: label,
-        fontSize: "14px",
-        fontWeight: "bold",
-        fontFamily: "Poppins",
-        className: "label",
-      });
+      marker.setLabel(createMarkerLabel(label));
     });
 
     marker.addListener("mouseout", function () {
-      marker.setLabel({
-        text: " ",
-      });
+      marker.setLabel(null);
     });
 
     marker.addListener("click", function () {
       infowindow.open(map, marker);
       marker.setIcon({
-        url: "img/darkerMarker.png",
+        // url: "img/darkerMarker.png",
         labelOrigin: new google.maps.Point(15, 50),
       });
     });
@@ -373,11 +363,23 @@ document
     markers.push(marker);
     window.mapMarkers = markers;
 
+    const mediaUrls = [];
+
+    const readFileAsDataURL = (file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    };
+
     Promise.all(Array.from(files).map(readFileAsDataURL)).then((base64Urls) => {
       mediaUrls.push(...base64Urls);
 
       // Assign to the last added marker
       markers[markers.length - 1].infoContent.mediaUrls = mediaUrls;
+
+      infowindow.setContent(createInfoWindowContent(description, mediaUrls));
 
       // Save to localStorage
       saveMarkers();
@@ -390,10 +392,10 @@ document
     closeModal();
     document.getElementById("addPlaceForm").reset();
 
-    if (slider.children.length >= 1) {
-      // Call dotCheck directly, passing the specific container
-      dotCheck(newPlaceContent);
-    }
+    document
+      .querySelector("#placeFiles")
+      .parentElement.querySelector("span").textContent =
+      "Upload photos or videos";
   });
 
 window.initMap = initMap;

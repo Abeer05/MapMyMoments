@@ -12,41 +12,105 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Protest+Riot&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
   </head>
   <body>
-    <div class="flex">
-      <h1>MapMyMoments</h1>
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <img src="img/mapmymoments.png" alt="MapMyMoments Logo" />
+          <h1>MapMyMoments</h1>
+        </div>
+      </div>
+    </header>
 
-      <div id="addLocationModal" class="modal">
-        <div class="modal-content">
-          <h2>Add New Location</h2>
-          <form id="addPlaceForm">
-            <label for="placeTitle">Label:</label>
-            <input type="text" id="placeTitle" name="placeTitle" required />
+    <main class="main-container">
+      <div class="map-container">
+        <div id="map"></div>
+        <button id="addLocation" class="fab" onclick="openModal()">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <section>
+        <p class="description">
+          MapMyMoments allows you to click anywhere on the map and create
+          memorable moments by adding a description and uploading photos. Each
+          location you click will drop a pin, making it easy to map out and
+          relive your favorite memories. Whether it's a special place, a fun
+          trip, or a hidden gem, this website helps you keep track of the spots
+          that mean the most to you, all while sharing them in a unique way!
+        </p>
+      </section>
+    </main>
+
+    <div id="addLocationModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Add New Location</h2>
+          <button class="close-button" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="addPlaceForm">
+          <div class="form-group">
+            <label for="placeTitle">Name of Location:</label>
+            <input
+              type="text"
+              id="placeTitle"
+              name="placeTitle"
+              placeholder="Enter a name for this location"
+              required
+            />
+          </div>
+
+          <div class="form-group">
             <label for="placeDescription">Description:</label>
             <textarea
               id="placeDescription"
               name="placeDescription"
+              placeholder="What is on your mind..."
               required
             ></textarea>
-            <label for="placeFiles">Upload up to 5 images or videos:</label>
-            <input type="file" id="placeFiles" name="placeFiles" multiple
-            accept="image/*,video/*"" />
-            <button type="submit">Submit</button>
-          </form>
-          <button id="closeModal" onclick="closeModal()">Cancel</button>
-        </div>
+          </div>
+
+          <div class="form-group">
+            <label for="placeFiles">Media:</label>
+            <div class="file-input-container">
+              <label class="file-input-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Upload photos or videos</span>
+                <input type="file" id="placeFiles" name="placeFiles" multiple
+                accept="image/*,video/*"" />
+              </label>
+              <span class="file-input-help">Maximum 5 files, 1.5MB each</span>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button
+              type="button"
+              id="closeModal"
+              class="btn btn-accent"
+              onclick="closeModal()"
+            >
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-check"></i> Save Location
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    <div id="map"></div>
-    <h4>
-      MapMyMoments allows you to click anywhere on the map and create memorable
-      moments by adding a description and uploading photos. Each location you
-      click will drop a pin, making it easy to map out and relive your favorite
-      memories. Whether it's a special place, a fun trip, or a hidden gem, this
-      website helps you keep track of the spots that mean the most to you, all
-      while sharing them in a unique way!
-    </h4>
+
+    <footer class="footer">
+      <p>&copy; 2025 MapMyMoments | Created By Abeer Malik</p>
+    </footer>
+
     <script src="script.js"></script>
     <script
       async
